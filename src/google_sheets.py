@@ -3,6 +3,7 @@ import os
 from typing import Optional
 
 import gspread
+from gspread.exceptions import APIError, SpreadsheetNotFound, WorksheetNotFound
 from google.oauth2.service_account import Credentials
 
 
@@ -39,13 +40,25 @@ def open_sheet(spreadsheet_name: str, worksheet_name: str):
     client = get_client()
     try:
         sh = client.open(spreadsheet_name)
-    except gspread.SpreadsheetNotFound:
-        sh = client.create(spreadsheet_name)
+    except SpreadsheetNotFound:
+        try:
+            sh = client.create(spreadsheet_name)
+        except APIError as err:
+            raise RuntimeError(
+                f"Spreadsheet '{spreadsheet_name}' was not found and could not be created. "
+                "The authenticated Google Drive account may be over quota or lack permission to create spreadsheets."
+            ) from err
 
     try:
         ws = sh.worksheet(worksheet_name)
-    except gspread.WorksheetNotFound:
-        ws = sh.add_worksheet(title=worksheet_name, rows=1000, cols=10)
+    except WorksheetNotFound:
+        try:
+            ws = sh.add_worksheet(title=worksheet_name, rows=1000, cols=10)
+        except APIError as err:
+            raise RuntimeError(
+                f"Worksheet '{worksheet_name}' could not be created inside '{spreadsheet_name}'. "
+                "Free space in Google Drive or create the worksheet manually, then rerun the scraper."
+            ) from err
 
     return sh, ws
 
@@ -59,4 +72,3 @@ def ensure_headers(ws, headers):
         return
     # If headers exist but differ, overwrite first row with our expected headers
     ws.update("A1", [headers])
-

@@ -1,12 +1,12 @@
 import logging
 import os
+import sys
 from pathlib import Path
 from typing import List
 
-import pandas as pd
-
-from google_sheets import open_sheet, ensure_headers
-from indeed_scraper import fetch_indeed_jobs, jobs_to_rows, job_headers
+# Use absolute imports so running via `python -m src.main` works.
+from src.google_sheets import open_sheet, ensure_headers
+from src.indeed_scraper import fetch_indeed_jobs, jobs_to_rows, job_headers
 
 
 def setup_logging():
@@ -63,7 +63,11 @@ def main():
     pages_per_keyword = int(os.getenv("PAGES_PER_KEYWORD", "1"))
 
     # Open sheet and ensure headers
-    _, ws = open_sheet(spreadsheet_name, worksheet_name)
+    try:
+        _, ws = open_sheet(spreadsheet_name, worksheet_name)
+    except RuntimeError as err:
+        logging.critical("%s", err)
+        sys.exit(1)
     headers = job_headers()
     ensure_headers(ws, headers)
 
@@ -81,4 +85,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

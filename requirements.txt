@@ -1,6 +1,7 @@
 requests==2.31.0
 beautifulsoup4==4.12.2
-pandas==2.1.4
+# Use a version with prebuilt wheels for Python 3.12+
+pandas==2.2.3
 gspread==6.0.2
 google-auth==2.23.4
 python-dotenv==1.0.0

@@ -37,6 +37,7 @@ OR place service_account.json at the project root.
 Installation
   python -m venv .venv
   .\.venv\Scripts\Activate.ps1
+  python -m pip install --upgrade pip setuptools wheel
   pip install -r requirements.txt
 
 Configuration (optional via env vars)
@@ -57,10 +58,15 @@ Notes
 - This prototype focuses on job scraping and data organization, not contact discovery.
 - For contact enrichment (name, title, email), plan to add a follow-up module using company domains and an enrichment API, then merge into the same sheet.
 
+Troubleshooting installs (Windows / Python 3.12+)
+- If you saw an error about pandas build dependencies (e.g., oldest-supported-numpy markers), upgrade tooling first:
+  - python -m pip install --upgrade pip setuptools wheel
+- The project now pins pandas to 2.2.3, which has wheels for Python 3.12. If you still get build attempts, try forcing wheels:
+  - pip install --only-binary=:all: pandas==2.2.3
+
 Next Steps (beyond prototype)
 - Add scheduler (cron, GitHub Actions, Task Scheduler)
 - Expand to additional job boards
 - Add company contact discovery + verification
 - Improve dedupe (hashing, fuzzy matching)
 - Unit tests for parsers
-
