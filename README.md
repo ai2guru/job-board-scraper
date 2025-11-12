@@ -45,6 +45,12 @@ Configuration (optional via env vars)
 - SHEET_TAB: worksheet/tab name (default: Indeed Jobs)
 - JOB_LOCATION: Indeed search location (default: United States)
 - PAGES_PER_KEYWORD: pages per keyword (default: 1)
+- INDEED_USER_AGENT: override the default desktop Chrome UA to reduce blocking
+- INDEED_ACCEPT_LANGUAGE: override Accept-Language header (default: en-US,en;q=0.9)
+- INDEED_EXTRA_HEADERS: JSON dict merged into the request headers (e.g. {"sec-ch-ua-platform": "\"Windows\""})
+- INDEED_SESSION_COOKIE: raw cookie string copied from a valid Indeed browser session
+- INDEED_RETRY_TOTAL: retry attempts for transient HTTP errors (default: 3)
+- INDEED_RETRY_BACKOFF: seconds for exponential backoff between retries (default: 1)
 
 Run
   python -m src.main
@@ -55,6 +61,7 @@ Headers:
 
 Notes
 - Indeed markup can change; the parser is defensive but may require updates over time.
+- If Indeed begins returning HTTP 403, set INDEED_USER_AGENT (or INDEED_SESSION_COOKIE / INDEED_EXTRA_HEADERS) with values copied from a working browser session and rerun.
 - This prototype focuses on job scraping and data organization, not contact discovery.
 - For contact enrichment (name, title, email), plan to add a follow-up module using company domains and an enrichment API, then merge into the same sheet.
 
